@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        *{
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        canvas{
+            position: absolute;
+        }
+        #tools{
+            position: absolute;
+            right: 10px;
+            top: 10px
+        }
+        .new_color{
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            border: none;
+            width: 30px;
+            height: 30px;
+            background: none;
+        }
+        .new_color::-webkit-color-swatch-wrapper{
+            padding: 0;
+        }
+        .new_color::-webkit-color-swatch{
+            border: 2px solid #666666;
+            border-radius: 50%;
+        }
+        .new_color::-moz-color-swatch{
+            border: 2px solid #666666;
+            border-radius: 50%;
+        }
+    </style>
+</head>
+<body>
+    <canvas></canvas>
+    <div id="tools">
+        <div id="colors">
+            <input type="color" class="new_color">
+        </div>
+    </div>
+    <script>
+        var canvas = document.querySelector("canvas")
+        canvas.width = innerWidth
+        canvas.height = innerHeight
+        var c = canvas.getContext("2d")
+
+        var camera = {x: 0, y: 0}
+        var zoom = 1
+
+        var grid_size = 10
+
+        var boxes = []
+
+        var drawing = false
+
+        window.onmousedown = function () {
+            drawing = true
+        }
+
+        window.onmouseup = function () {
+            drawing = false
+        }
+        window.onmousemove = function (e) {
+            if (drawing) {
+                var x = grid_size * Math.floor(e.clientX / grid_size)
+                var y = grid_size * Math.floor(e.clientY / grid_size)
+                boxes.push([x, y])
+            }
+        }
+
+        window.onwheel = function (e) {
+            console.log(e.deltaY)
+            if (e.deltaY <= 0) {
+                zoom += -e.deltaY * 0.005
+            }
+            else {
+                zoom -= 1 / e.deltaY * 50
+            }
+            
+        }
+
+        function animate() {
+            requestAnimationFrame(animate)
+            c.setTransform(1, 0, 0, 1, 0, 0)
+            c.clearRect(0, 0, canvas.width, canvas.height)
+            c.scale(zoom, zoom)
+            //c.translate(camera.x, camera.y)
+            boxes.forEach(box => {
+                c.beginPath()
+                c.fillRect(box[0], box[1], grid_size, grid_size)
+            })
+        }
+        animate()
+    </script>
+</body>
+</html>
